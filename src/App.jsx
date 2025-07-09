@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import axios from 'axios'
 import './App.css'
+import SearchBar from './components/SearchBar'
+
+import {useEffect} from 'react'
 
 export default function App() {
   const[restaurants, setRestaurants] = useState([])
@@ -23,6 +26,12 @@ export default function App() {
     console.error('Error fetching restaurants:', error)
   }
 }
+
+ useEffect(() => {
+      fetchRestaurants('test')
+    }, [])
+
+
 
 return (
   <div>

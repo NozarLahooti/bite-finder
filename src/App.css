@@ -1,11 +1,3 @@
-:root {
-  --brand-color: #ff6b6b;
-  --bg-color:    #f8f9fa;
-  --text-color:  #333;
-  --card-bg:     #fff;
-  --muted-color: #777;
-}
-
 body {
   margin: 0;
   padding: 0;

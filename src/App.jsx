@@ -1,72 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useParams
+} from 'react-router-dom';
 import './App.css';
 import SearchBar from './components/SearchBar';
 
-export default function App() {
+function Home() {
   const [restaurants, setRestaurants] = useState([]);
 
-  
-  const fetchRestaurants = async (cityName) => {
+  useEffect(() => {
+    fetch('New York');
+  }, []);
+
+  const fetch = async (cityName) => {
     try {
-      
-      const locationResponse = await axios.get(
+      const loc = await axios.get(
         'https://tripadvisor16.p.rapidapi.com/api/v1/restaurant/searchLocation',
         {
           params: { query: cityName },
           headers: {
-            'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_KEY,
+            'x-rapidapi-key':  import.meta.env.VITE_RAPIDAPI_KEY,
             'x-rapidapi-host': import.meta.env.VITE_RAPIDAPI_HOST,
-          },
+          }
         }
       );
-      const locations = locationResponse.data.data;
-      if (!locations?.length || !locations[0].locationId) {
-        throw new Error('City not found');
-      }
-      const locationId = locations[0].locationId;
-
-      
-      const restaurantResponse = await axios.get(
+      const id = loc.data.data[0]?.locationId;
+      const res = await axios.get(
         'https://tripadvisor16.p.rapidapi.com/api/v1/restaurant/searchRestaurants',
         {
-          params: { locationId },
+          params: { locationId: id },
           headers: {
-            'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_KEY,
+            'x-rapidapi-key':  import.meta.env.VITE_RAPIDAPI_KEY,
             'x-rapidapi-host': import.meta.env.VITE_RAPIDAPI_HOST,
-          },
+          }
         }
       );
-      setRestaurants(restaurantResponse.data.data || []);
-    } catch (error) {
-      console.error('Error fetching restaurants:', error);
-      
-      setRestaurants([
-        { name: 'Mock Sushi Place', location: 'New York', rating: 4.5 },
-        { name: 'Mock Pasta House', location: 'New York', rating: 4.3 },
-        { name: 'Mock Burger Joint', location: 'New York', rating: 4.1 },
-      ]);
+      setRestaurants(res.data.data || []);
+    } catch {
+      setRestaurants([{ name: 'Mock Sushi', location: 'NY', rating: 4 }]);
     }
   };
-
-  
-  useEffect(() => {
-    fetchRestaurants('New York');
-  }, []);
 
   return (
     <div className="App">
       <h1>BiteFinder</h1>
-      <SearchBar onSearch={fetchRestaurants} />
+      <SearchBar onSearch={fetch} />
       <ul>
-        {restaurants.map((item, i) => (
+        {restaurants.map((r, i) => (
           <li key={i}>
-            <span>{item.name}</span>
-            {item.location && ` — ${item.location}`}
-            {item.rating && ` (⭐ ${item.rating})`}
+            <Link to={`/restaurant/${r.locationId || i}`}>
+              {r.name} {r.location && `— ${r.location}`}
+            </Link>
           </li>
         ))}
       </ul>
     </div>
+  );
+}
+
+function Detail() {
+  const { id } = useParams();
+  return (
+    <div className="App">
+      <h2>Details for {id}</h2>
+      <Link to="/">← Back</Link>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/restaurant/:id" element={<Detail />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

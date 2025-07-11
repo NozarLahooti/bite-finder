@@ -14,7 +14,7 @@ export default function SearchBar({ onSearch }) {
     <form onSubmit={handleSubmit}>
       <input
         type="text"
-        placeholder="Type anything to test"
+        placeholder="e.g Miami, FL"
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />

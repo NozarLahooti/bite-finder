@@ -1,16 +1,21 @@
-.App {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 1rem;
-  font-family: sans-serif;
+:root {
+  --brand-color: #ff6b6b;
+  --bg-color:    #f8f9fa;
+  --text-color:  #333;
+  --card-bg:     #fff;
+  --muted-color: #777;
 }
 
-h1 {
-  text-align: center;
-  color: #333;
-}
-
-ul {
-  list-style: none;
+body {
+  margin: 0;
   padding: 0;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.App {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }

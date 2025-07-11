@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import {
   BrowserRouter,
@@ -13,65 +13,69 @@ import RestaurantCard from './components/RestaurantCard';
 
 function Home() {
   const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetch('New York');
-  }, []);
+  const fetchRestaurants = async (input) => {
+    setLoading(true);
+    setError(null);
 
-  const fetch = async (cityName) => {
     try {
-      
-      const options = {
-          method: 'GET',
-          url: 'https://restaurants-near-me-usa.p.rapidapi.com/restaurants/all-city',
-          params: { city: cityName },
-          headers: {
-            headers: {
-              'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_KEY,
-              'x-rapidapi-host': import.meta.env.VITE_RAPIDAPI_HOST
-}
+      if (!input || !input.includes(',')) {
+        throw new Error('Please enter input like: Miami, FL');
+      }
 
+      const [rawCity, rawState] = input.split(',').map(str => str.trim());
 
-            
-  }
-};
+      if (!rawCity || !rawState) {
+        throw new Error('Please enter both city and state like: Miami, FL');
+      }
 
-const response = await axios.request(options);
-console.log('API DATA:', response.data);
-setRestaurants(response.data);
+      const city = rawCity
+        .toLowerCase()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
 
+      const state = rawState.toUpperCase();
 
+      const fakeData = [
+        {
+          name: 'Joe’s Pizza',
+          address: '123 Main St, Miami, FL',
+          phone: '(305) 555-1234'
+        },
+        {
+          name: 'Ocean Diner',
+          address: '456 Ocean Ave, Miami, FL',
+          phone: '(305) 555-5678'
+        }
+      ];
 
-      
-    } catch {
-      setRestaurants([{ name: 'Mock Sushi', location: 'NY', rating: 4 }]);
+      setRestaurants(fakeData);
+
+    } catch (e) {
+      setRestaurants([]);
+      setError(e.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="App">
       <h1>BiteFinder</h1>
-      <SearchBar onSearch={fetch} />
-      {/* <ul>
-        {restaurants.map((r, i) => (
-          <li key={i}>
-            <Link to={`/restaurant/${r.locationId || i}`}>
-              {r.name} {r.location && `— ${r.location}`}
-            </Link>
-          </li>
-        ))}
-      </ul> */}
+      <SearchBar onSearch={fetchRestaurants} />
+      {loading && <p>Loading restaurants...</p>}
+      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
       <ul>
-        {restaurants.map((r) => (
+        {restaurants.map((r, index) => (
           <RestaurantCard
-            key={`${r.name}-${r.address || r.phone || Math.random()}`}
+            key={`${r.name}-${r.address || r.phone || index}`}
             data={r}
           />
-  ))}
+        ))}
       </ul>
-
-
-
     </div>
   );
 }
